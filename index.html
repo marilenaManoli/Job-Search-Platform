@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swiss Job Search Hub</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="shell">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-head">
+    <h2>🇨🇭 Job Hub</h2>
+    <p>Swiss Search Tracker</p>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Overview</div>
+    <button class="nav-item active" onclick="showPage('dashboard')"><i class="ti ti-layout-dashboard"></i><span>Dashboard</span></button>
+    <button class="nav-item" onclick="showPage('profile')"><i class="ti ti-user-circle"></i><span>My Profile</span></button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Applications</div>
+    <button class="nav-item" onclick="showPage('tracker')"><i class="ti ti-briefcase"></i><span>Tracker</span></button>
+    <button class="nav-item" onclick="showPage('finder')"><i class="ti ti-search"></i><span>Find Jobs (AI)</span></button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">AI Tools</div>
+    <button class="nav-item" onclick="showPage('letters')"><i class="ti ti-file-text"></i><span>Cover Letters</span></button>
+    <button class="nav-item" onclick="showPage('outreach')"><i class="ti ti-send"></i><span>Outreach</span></button>
+    <button class="nav-item" onclick="showPage('suggestions')"><i class="ti ti-bulb"></i><span>Suggestions</span></button>
+    <button class="nav-item" onclick="showPage('goals')"><i class="ti ti-checklist"></i><span>Weekly Goals</span></button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Config</div>
+    <button class="nav-item" onclick="showPage('settings')"><i class="ti ti-settings"></i><span>Settings</span></button>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="api-status">
+      <div class="api-dot" id="api-dot"></div>
+      <span id="api-label">API: not set</span>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- DASHBOARD -->
+<div id="page-dashboard" class="page active">
+  <div class="page-header">
+    <h1>Dashboard</h1>
+    <p>Target: September 2026 &nbsp;·&nbsp; Zürich & Basel &nbsp;·&nbsp; Junior / Internship / Research</p>
+  </div>
+  <div class="stats-row" id="dash-stats"></div>
+
+  <div class="section-label">Quick actions</div>
+  <div class="quick-actions">
+    <button class="quick-action" onclick="showPage('finder')">
+      <i class="ti ti-search qa-icon"></i>
+      <div><div class="qa-label">Scan for jobs</div><div class="qa-sub">AI-powered job search</div></div>
+    </button>
+    <button class="quick-action" onclick="showPage('letters')">
+      <i class="ti ti-file-text qa-icon"></i>
+      <div><div class="qa-label">Write cover letter</div><div class="qa-sub">AI-tailored to company</div></div>
+    </button>
+    <button class="quick-action" onclick="showPage('outreach')">
+      <i class="ti ti-send qa-icon"></i>
+      <div><div class="qa-label">Recruiter outreach</div><div class="qa-sub">LinkedIn / email drafts</div></div>
+    </button>
+    <button class="quick-action" onclick="showPage('tracker')">
+      <i class="ti ti-plus qa-icon"></i>
+      <div><div class="qa-label">Add application</div><div class="qa-sub">Log a new role</div></div>
+    </button>
+  </div>
+
+  <div class="section-label">Recent applications</div>
+  <div class="card" style="padding:0; overflow:hidden;">
+    <table class="app-table" id="dash-apps">
+      <thead><tr><th>Company</th><th>Role</th><th>City</th><th>Status</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="section-label">This week's goals</div>
+  <div id="dash-goals"></div>
+</div>
+
+<!-- PROFILE -->
+<div id="page-profile" class="page">
+  <div class="page-header">
+    <h1>My Profile</h1>
+    <p>Used by all AI tools to personalise cover letters, outreach, and job matching.</p>
+  </div>
+  <div class="card">
+    <div class="form-row">
+      <div class="form-group"><label>Full name</label><input type="text" id="p-name" placeholder="e.g. Emma Clarke" /></div>
+      <div class="form-group"><label>Email</label><input type="email" id="p-email" placeholder="you@email.com" /></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>LinkedIn URL</label><input type="url" id="p-linkedin" placeholder="linkedin.com/in/yourname" /></div>
+      <div class="form-group"><label>GitHub URL</label><input type="url" id="p-github" placeholder="github.com/yourname" /></div>
+    </div>
+    <div class="divider"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Bachelor's degree</label><input type="text" id="p-bsc" placeholder="e.g. BSc Computer Science, University of Leeds" /></div>
+      <div class="form-group"><label>Master's degree</label><input type="text" id="p-msc" placeholder="e.g. MSc Computer Science, University of Bern" /></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Graduation date</label><input type="text" id="p-grad" placeholder="e.g. August 2026" /></div>
+      <div class="form-group"><label>Thesis / main project</label><input type="text" id="p-thesis" placeholder="e.g. Multimodal human-AI interaction system" /></div>
+    </div>
+    <div class="form-group"><label>Work permit / nationality</label>
+      <select id="p-permit">
+        <option value="">Select...</option>
+        <option value="EU citizen (free movement)">EU citizen — free movement in Switzerland</option>
+        <option value="UK citizen (studied in Switzerland)">UK citizen — studied in Switzerland</option>
+        <option value="Non-EU/EFTA (Swiss residence permit)">Non-EU/EFTA with Swiss residence permit</option>
+        <option value="Swiss citizen">Swiss citizen</option>
+      </select>
+    </div>
+    <div class="divider"></div>
+    <div class="form-group"><label>Technical skills (click to toggle)</label>
+      <div class="skills-grid" id="skills-grid"></div>
+    </div>
+    <div class="form-group" style="margin-top:10px;"><label>Other skills / tools (comma separated)</label>
+      <input type="text" id="p-other-skills" placeholder="e.g. Figma, Jupyter, React, SQL" />
+    </div>
+    <div class="divider"></div>
+    <div class="form-group"><label>Languages</label>
+      <input type="text" id="p-langs" placeholder="e.g. English (native), German (B1), French (A2)" />
+    </div>
+    <div class="form-group"><label>Target role types (check all that apply)</label>
+      <div class="checkbox-group">
+        <label class="checkbox-pill" id="pill-swe"><input type="checkbox" id="rt-swe" onchange="togglePill(this,'pill-swe')"><span>Junior SWE</span></label>
+        <label class="checkbox-pill" id="pill-growth"><input type="checkbox" id="rt-growth" onchange="togglePill(this,'pill-growth')"><span>Growth Engineer</span></label>
+        <label class="checkbox-pill" id="pill-data"><input type="checkbox" id="rt-data" onchange="togglePill(this,'pill-data')"><span>Data Engineer</span></label>
+        <label class="checkbox-pill" id="pill-ai"><input type="checkbox" id="rt-ai" onchange="togglePill(this,'pill-ai')"><span>AI / ML</span></label>
+        <label class="checkbox-pill" id="pill-pm"><input type="checkbox" id="rt-pm" onchange="togglePill(this,'pill-pm')"><span>AI Product</span></label>
+        <label class="checkbox-pill" id="pill-ux"><input type="checkbox" id="rt-ux" onchange="togglePill(this,'pill-ux')"><span>UX / HCI</span></label>
+        <label class="checkbox-pill" id="pill-research"><input type="checkbox" id="rt-research" onchange="togglePill(this,'pill-research')"><span>Research</span></label>
+        <label class="checkbox-pill" id="pill-intern"><input type="checkbox" id="rt-intern" onchange="togglePill(this,'pill-intern')"><span>Internship</span></label>
+        <label class="checkbox-pill" id="pill-consult"><input type="checkbox" id="rt-consult" onchange="togglePill(this,'pill-consult')"><span>Consulting</span></label>
+      </div>
+    </div>
+    <div class="form-group"><label>Key strengths / value proposition (1–3 sentences)</label>
+      <textarea id="p-strengths" rows="3" placeholder="e.g. I combine strong CS foundations with human-centered thinking…"></textarea>
+    </div>
+    <div class="form-group"><label>Work style preferences</label>
+      <input type="text" id="p-prefs" placeholder="e.g. hybrid/remote preferred, collaborative teams, startup or research environments" />
+    </div>
+    <button class="btn btn-primary" onclick="saveProfile()"><i class="ti ti-device-floppy"></i>Save profile</button>
+  </div>
+</div>
+
+<!-- TRACKER -->
+<div id="page-tracker" class="page">
+  <div class="page-header">
+    <h1>Application Tracker</h1>
+    <p>Log every role — saved, applied, in progress.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div style="font-size:13px; font-weight:500; margin-bottom:12px;">Add application</div>
+    <div class="form-row">
+      <div class="form-group"><label>Company</label><input type="text" id="add-company" placeholder="Company name" /></div>
+      <div class="form-group"><label>Role title</label><input type="text" id="add-role" placeholder="Job title" /></div>
+      <div class="form-group"><label>City</label>
+        <select id="add-city"><option>Zürich</option><option>Basel</option><option>Bern</option><option>Remote</option><option>Other</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Type</label>
+        <select id="add-type"><option value="junior">Junior</option><option value="intern">Internship</option><option value="research">Research</option></select>
+      </div>
+      <div class="form-group"><label>Status</label>
+        <select id="add-status"><option value="saved">Saved</option><option value="applied">Applied</option><option value="interview">Interviewing</option><option value="offer">Offer</option><option value="rejected">Rejected</option></select>
+      </div>
+      <div class="form-group"><label>Job URL</label><input type="url" id="add-url" placeholder="https://..." /></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Date applied</label><input type="date" id="add-date" /></div>
+      <div class="form-group"><label>Deadline</label><input type="date" id="add-deadline" /></div>
+      <div class="form-group" style="flex:2;"><label>Notes</label><input type="text" id="add-notes" placeholder="Recruiter name, contacts, impressions…" /></div>
+    </div>
+    <button class="btn btn-primary" onclick="addApp()"><i class="ti ti-plus"></i>Add</button>
+  </div>
+
+  <div style="display:flex; gap:8px; align-items:center; margin-bottom:14px; flex-wrap:wrap;">
+    <select id="filter-status" onchange="renderTracker()" style="width:auto;">
+      <option value="">All statuses</option>
+      <option value="saved">Saved</option><option value="applied">Applied</option>
+      <option value="interview">Interviewing</option><option value="offer">Offer</option><option value="rejected">Rejected</option>
+    </select>
+    <select id="filter-city" onchange="renderTracker()" style="width:auto;">
+      <option value="">All cities</option>
+      <option value="Zürich">Zürich</option><option value="Basel">Basel</option>
+    </select>
+    <select id="filter-type" onchange="renderTracker()" style="width:auto;">
+      <option value="">All types</option>
+      <option value="junior">Junior</option><option value="intern">Internship</option><option value="research">Research</option>
+    </select>
+    <span id="tracker-count" style="font-size:12px; color:var(--text-3); margin-left:auto;"></span>
+  </div>
+
+  <div class="card" style="padding:0; overflow:hidden;">
+    <table class="app-table" id="app-table">
+      <thead><tr>
+        <th>Company / Role</th><th>City</th><th>Type</th><th>Status</th>
+        <th>Applied</th><th>Deadline</th><th>Notes</th><th></th>
+      </tr></thead>
+      <tbody id="app-tbody"></tbody>
+    </table>
+    <div id="tracker-empty" class="empty" style="display:none;">
+      <i class="ti ti-briefcase"></i><p>No applications yet. Add your first one above.</p>
+    </div>
+  </div>
+</div>
+
+<!-- JOB FINDER -->
+<div id="page-finder" class="page">
+  <div class="page-header">
+    <h1>Find Jobs (AI)</h1>
+    <p>Uses Claude + live web search to find current Swiss openings matching your profile.</p>
+  </div>
+
+  <div id="finder-no-api" class="alert alert-warn" style="display:none;">
+    <i class="ti ti-alert-triangle" style="vertical-align:-2px; margin-right:6px;"></i>
+    No API key set. <a href="#" onclick="showPage('settings'); return false;" style="color:inherit; font-weight:500;">Add your Anthropic API key</a> in Settings to use AI features.
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Job category focus</label>
+        <select id="scan-cat" onchange="renderSearchLinks()">
+          <option value="all">All matching roles</option>
+          <option value="swe">Junior Software Engineer</option>
+          <option value="growth">Growth Engineer / Product Growth</option>
+          <option value="data">Data / ML Engineer</option>
+          <option value="ai">AI / Human-centered AI</option>
+          <option value="research">Research / Academic</option>
+          <option value="intern">Internships (all)</option>
+          <option value="product">AI Product / UX</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>City preference</label>
+        <select id="scan-city" onchange="renderSearchLinks()">
+          <option value="both">Zürich + Basel</option>
+          <option value="zurich">Zürich only</option>
+          <option value="basel">Basel only</option>
+          <option value="remote">Remote / anywhere CH</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Extra keywords (optional)</label>
+      <input type="text" id="scan-kw" placeholder="e.g. Python, English-speaking, startup, UX research" oninput="renderSearchLinks()" />
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <button class="btn btn-primary" onclick="scanJobs()" id="scan-btn"><i class="ti ti-search"></i>Scan for jobs now</button>
+      <span style="font-size:12px; color:var(--text-3);" id="scan-last"></span>
+    </div>
+  </div>
+
+  <div class="section-label">Quick search links — open directly in each job board</div>
+  <div class="card" style="margin-bottom:16px;">
+    <div style="font-size:12px; color:var(--text-3); margin-bottom:12px;">Pre-filled from your filters above. No API needed — click any to search that platform directly.</div>
+    <div id="search-links" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+  </div>
+
+  <div class="section-label" id="scan-results-label">AI scan results</div>
+  <div id="scan-results">
+    <div class="empty"><i class="ti ti-telescope"></i><p>Run a scan to find current openings. Requires Anthropic API for live web search.</p></div>
+  </div>
+</div>
+
+<!-- COVER LETTERS -->
+<div id="page-letters" class="page">
+  <div class="page-header">
+    <h1>Cover Letter Generator</h1>
+    <p>AI-tailored letters based on your profile and the specific job.</p>
+  </div>
+
+  <div id="letters-no-api" class="alert alert-warn" style="display:none;">
+    <i class="ti ti-alert-triangle" style="vertical-align:-2px; margin-right:6px;"></i>
+    No API key set. <a href="#" onclick="showPage('settings'); return false;" style="color:inherit; font-weight:500;">Add your Anthropic API key</a> in Settings.
+  </div>
+
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+    <div class="card">
+      <div style="font-size:13px; font-weight:500; margin-bottom:14px;">Job details</div>
+      <div class="form-group"><label>Company name</label><input type="text" id="cl-company" placeholder="e.g. ELCA Informatique" /></div>
+      <div class="form-group"><label>Role title</label><input type="text" id="cl-role" placeholder="e.g. Junior Software Engineer" /></div>
+      <div class="form-group"><label>Job description (paste key points)</label>
+        <textarea id="cl-jd" rows="5" placeholder="Paste the job description or key requirements here…"></textarea>
+      </div>
+      <div class="form-group"><label>What excites you about this role/company?</label>
+        <textarea id="cl-why" rows="2" placeholder="e.g. Their focus on human-centred AI tools, Swiss-based team, mission-driven work…"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Tone</label>
+          <select id="cl-tone">
+            <option value="professional and warm">Professional & warm</option>
+            <option value="formal">Formal</option>
+            <option value="conversational">Conversational</option>
+            <option value="confident and direct">Confident & direct</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Length</label>
+          <select id="cl-len">
+            <option value="concise (3 short paragraphs)">Concise (3 paragraphs)</option>
+            <option value="standard (4 paragraphs)">Standard (4 paragraphs)</option>
+            <option value="detailed (5 paragraphs)">Detailed (5 paragraphs)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>Anything specific to highlight or avoid?</label>
+        <input type="text" id="cl-extra" placeholder="e.g. Emphasise thesis project, mention Swiss study experience" />
+      </div>
+      <button class="btn btn-primary" onclick="generateLetter()" id="cl-btn" style="width:100%;">
+        <i class="ti ti-sparkles"></i>Generate cover letter
+      </button>
+    </div>
+    <div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <span style="font-size:13px; font-weight:500;">Generated letter</span>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-sm btn-ghost" onclick="copyLetter()" id="copy-btn" style="display:none;"><i class="ti ti-copy"></i>Copy</button>
+          <button class="btn btn-sm btn-ghost" onclick="downloadLetter()" id="dl-btn" style="display:none;"><i class="ti ti-download"></i>Save .txt</button>
+        </div>
+      </div>
+      <div class="letter-box" id="cl-output">
+        <div class="ai-placeholder"><i class="ti ti-file-text" style="font-size:24px; display:block; margin-bottom:8px;"></i>Fill in the job details and click "Generate" to create your tailored cover letter.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OUTREACH -->
+<div id="page-outreach" class="page">
+  <div class="page-header">
+    <h1>Recruiter Outreach</h1>
+    <p>AI-generated LinkedIn messages and emails for recruiters and companies.</p>
+  </div>
+
+  <div id="outreach-no-api" class="alert alert-warn" style="display:none;">
+    <i class="ti ti-alert-triangle" style="vertical-align:-2px; margin-right:6px;"></i>
+    No API key set. <a href="#" onclick="showPage('settings'); return false;" style="color:inherit; font-weight:500;">Add your Anthropic API key</a> in Settings.
+  </div>
+
+  <div class="section-label">Key recruiting agencies</div>
+  <div class="recruiter-grid" id="recruiter-grid"></div>
+
+  <div class="section-label">Generate message</div>
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+    <div class="card">
+      <div class="form-group"><label>Message type</label>
+        <select id="out-type">
+          <option value="LinkedIn cold DM to recruiter">LinkedIn DM — cold to recruiter</option>
+          <option value="LinkedIn DM following up on application">LinkedIn DM — follow-up after applying</option>
+          <option value="cold email to company HR">Cold email to company HR</option>
+          <option value="LinkedIn DM to hiring manager">LinkedIn DM — hiring manager</option>
+          <option value="networking message to alumni">Networking — alumni contact</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Recipient name (optional)</label>
+        <input type="text" id="out-name" placeholder="e.g. Sophie Müller" />
+      </div>
+      <div class="form-group"><label>Company / agency</label>
+        <input type="text" id="out-company" placeholder="e.g. Hays Switzerland" />
+      </div>
+      <div class="form-group"><label>Role or opportunity to mention</label>
+        <input type="text" id="out-role" placeholder="e.g. Junior Software Engineer roles, open to suggestions" />
+      </div>
+      <div class="form-group"><label>Tone</label>
+        <select id="out-tone">
+          <option value="professional and friendly">Professional & friendly</option>
+          <option value="formal">Formal</option>
+          <option value="direct and concise">Direct & concise</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="generateOutreach()" id="out-btn" style="width:100%;">
+        <i class="ti ti-sparkles"></i>Generate message
+      </button>
+    </div>
+    <div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <span style="font-size:13px; font-weight:500;">Generated message</span>
+        <button class="btn btn-sm btn-ghost" onclick="copyOutreach()" id="out-copy-btn" style="display:none;"><i class="ti ti-copy"></i>Copy</button>
+      </div>
+      <div class="letter-box" id="out-output" style="min-height:200px;">
+        <div class="ai-placeholder"><i class="ti ti-send" style="font-size:24px; display:block; margin-bottom:8px;"></i>Configure the message and click "Generate".</div>
+      </div>
+      <div style="margin-top:12px; font-size:12px; color:var(--text-3);">
+        <i class="ti ti-bulb" style="vertical-align:-2px;"></i> Tip: Always personalise the first line before sending. Mention a specific role or recent company news.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GOALS -->
+<div id="page-goals" class="page">
+  <div class="page-header">
+    <h1>Weekly Goals</h1>
+    <p>Track your weekly job search actions. New week? Reset and set new goals.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <div>
+        <div style="font-size:13px; font-weight:500;" id="goals-week-label">This week</div>
+        <div style="font-size:12px; color:var(--text-3);" id="goals-progress-label"></div>
+      </div>
+      <button class="btn btn-sm" onclick="resetWeek()"><i class="ti ti-refresh"></i>New week</button>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="goals-progress-bar" style="width:0%"></div></div>
+  </div>
+
+  <div class="form-row" style="margin-bottom:14px;">
+    <div class="form-group" style="flex:3;"><input type="text" id="goal-input" placeholder="Add a goal…" onkeydown="if(event.key==='Enter')addGoal()" /></div>
+    <div class="form-group"><select id="goal-tag">
+      <option value="Apply">Apply</option><option value="Network">Network</option>
+      <option value="Profile">Profile</option><option value="Prep">Prep</option>
+      <option value="Research">Research</option><option value="Other">Other</option>
+    </select></div>
+    <button class="btn btn-primary" onclick="addGoal()" style="height:36px; align-self:flex-end;"><i class="ti ti-plus"></i>Add</button>
+  </div>
+
+  <div id="goals-list"></div>
+</div>
+
+<!-- SUGGESTIONS -->
+<div id="page-suggestions" class="page">
+  <div class="page-header">
+    <h1>Suggestions</h1>
+    <p>AI analysis of your profile, tracker state, and preferences — personalised advice to sharpen your search.</p>
+  </div>
+
+  <div id="suggestions-no-api" class="alert alert-warn" style="display:none;">
+    <i class="ti ti-alert-triangle" style="vertical-align:-2px; margin-right:6px;"></i>
+    No API key set. <a href="#" onclick="showPage('settings'); return false;" style="color:inherit; font-weight:500;">Add your Anthropic API key</a> in Settings.
+  </div>
+
+  <div style="display:flex; gap:10px; align-items:center; margin-bottom:22px;">
+    <button class="btn btn-primary" onclick="generateSuggestions()" id="sug-btn">
+      <i class="ti ti-sparkles"></i>Analyse my profile
+    </button>
+    <span style="font-size:12px; color:var(--text-3);" id="sug-last"></span>
+  </div>
+
+  <div id="sug-results">
+    <div class="empty"><i class="ti ti-bulb"></i><p>Click "Analyse my profile" to get personalised suggestions based on your profile and current search progress.</p></div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="page-settings" class="page">
+  <div class="page-header">
+    <h1>Settings</h1>
+    <p>API key and app configuration.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div style="font-size:13px; font-weight:500; margin-bottom:4px;">AI Provider</div>
+    <div style="font-size:12px; color:var(--text-3); margin-bottom:12px;">Choose between the Anthropic API (Claude, paid) or a free local model via Ollama.</div>
+    <div class="form-group">
+      <label>Active provider</label>
+      <select id="provider-sel" onchange="saveProvider()" style="max-width:260px;">
+        <option value="anthropic">Anthropic — Claude API (paid)</option>
+        <option value="ollama">Ollama — local model (free)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;" id="card-anthropic">
+    <div style="font-size:13px; font-weight:500; margin-bottom:4px;">Anthropic API key</div>
+    <div style="font-size:12px; color:var(--text-3); margin-bottom:12px;">Required for Claude AI features and live web search. Get yours at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent);">console.anthropic.com</a>. Stored locally in your browser only.</div>
+    <div class="form-row">
+      <div class="form-group" style="flex:3;"><input type="password" id="api-key-input" placeholder="sk-ant-…" /></div>
+      <button class="btn btn-primary" onclick="saveApiKey()" style="height:36px; align-self:flex-end;"><i class="ti ti-device-floppy"></i>Save key</button>
+    </div>
+    <div class="alert alert-warn" style="margin-top:10px; font-size:12px;">
+      <i class="ti ti-shield" style="vertical-align:-2px; margin-right:5px;"></i>
+      Your API key is stored only in your browser's localStorage. Never share this file with your key saved in it.
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;" id="card-ollama">
+    <div style="font-size:13px; font-weight:500; margin-bottom:4px;">Ollama — local model <span class="badge b-offer" style="font-size:10px; vertical-align:middle;">Free</span></div>
+    <div style="font-size:12px; color:var(--text-3); margin-bottom:12px;">Run cover letters, outreach, and suggestions locally at no cost. Requires <a href="https://ollama.com" target="_blank" style="color:var(--accent);">Ollama</a> running on your machine. Note: live web search requires Anthropic.</div>
+    <div class="form-row">
+      <div class="form-group"><label>Ollama URL</label>
+        <input type="text" id="ollama-url" placeholder="http://localhost:11434" />
+      </div>
+      <div class="form-group"><label>Model name</label>
+        <input type="text" id="ollama-model" placeholder="e.g. llama3, mistral, qwen2.5" />
+      </div>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
+      <button class="btn" onclick="saveOllamaSettings()"><i class="ti ti-device-floppy"></i>Save</button>
+      <button class="btn" onclick="testOllama()"><i class="ti ti-plug"></i>Test connection</button>
+      <span id="ollama-test-result" style="font-size:12px;"></span>
+    </div>
+    <div class="alert alert-info" style="font-size:12px;">
+      <i class="ti ti-terminal" style="vertical-align:-2px; margin-right:5px;"></i>
+      If you get a CORS error, start Ollama with: <code style="font-family:var(--mono); background:rgba(0,0,0,0.06); padding:1px 5px; border-radius:3px;">OLLAMA_ORIGINS=* ollama serve</code>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div style="font-size:13px; font-weight:500; margin-bottom:12px;">Data management</div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn" onclick="exportData()"><i class="ti ti-download"></i>Export all data (.json)</button>
+      <button class="btn" onclick="document.getElementById('import-file').click()"><i class="ti ti-upload"></i>Import data (.json)</button>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)" />
+      <button class="btn btn-danger" onclick="clearAll()"><i class="ti ti-trash"></i>Clear all data</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="font-size:13px; font-weight:500; margin-bottom:8px;">Job alert reminder</div>
+    <div style="font-size:12px; color:var(--text-2); line-height:1.7;">
+      This app can't run in the background, but here's the recommended routine:<br>
+      <strong>Mon morning:</strong> Run a job scan, review 5+ new listings.<br>
+      <strong>Tue–Thu:</strong> Send 1–2 targeted applications with tailored letters.<br>
+      <strong>Fri:</strong> Do recruiter outreach (1–2 messages) + update tracker.<br><br>
+      Set a calendar reminder in Google/Apple Calendar: <em>"Swiss job search — 30 min"</em> on Mon + Fri each week until September.
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- JS: load order matters — state first, then api/ui, then pages, then init -->
+<script src="js/state.js"></script>
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/tracker.js"></script>
+<script src="js/profile.js"></script>
+<script src="js/goals.js"></script>
+<script src="js/finder.js"></script>
+<script src="js/letters.js"></script>
+<script src="js/outreach.js"></script>
+<script src="js/suggestions.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
