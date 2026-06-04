@@ -1,94 +1,157 @@
 # Swiss Job Search Hub
 
-A local, browser-based job search tracker and AI assistant tailored for the Swiss tech market. No server, no framework, no dependencies — just open `index.html`.
+A fullstack job search tracker and AI assistant for the Swiss tech market.
 
-## Features
+**Stack:** React + Vite · FastAPI · PostgreSQL · JWT auth · Docker
 
-- **Dashboard** — live stats: tracked roles, active pipeline, interviews, weekly goal progress
-- **Application Tracker** — log every role with status, deadline, notes, and city; filter and sort
-- **Find Jobs (AI)** — live web search via Claude API, or a targeted search strategy via Ollama; smart pre-filled links for 8 Swiss job boards that update as you change filters
-- **Cover Letter Generator** — AI-tailored letters based on your profile and the job description; copy or download as `.txt`
-- **Recruiter Outreach** — AI-generated LinkedIn DMs and cold emails for agencies and hiring managers
-- **Suggestions** — AI analysis of your profile and tracker state across 5 categories: Role Fit, Companies to Target, Strengths, Skill Gaps, Quick Wins
-- **Weekly Goals** — add, complete, and reset goals with a progress bar
-- **Settings** — switch between Anthropic (Claude) and Ollama (free, local); export/import/clear data
+---
 
-## Getting started
+## Quick start (Docker)
 
 ```bash
-open index.html   # macOS
-# or just double-click index.html in Finder
+# 1. Clone and enter the project
+git clone https://github.com/marilenaManoli/Job-Search-Platform.git
+cd Job-Search-Platform
+
+# 2. Start everything
+docker compose up --build
+
+# 3. Open the app
+open http://localhost:3000
 ```
 
-No build step, no install.
+The backend API is available at `http://localhost:8000`.  
+Interactive API docs: `http://localhost:8000/docs`
+
+---
+
+## Local development (without Docker)
+
+### PostgreSQL
+
+You need a running PostgreSQL instance. With Docker:
+```bash
+docker run -d --name pg -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=jobsearch -p 5432:5432 postgres:16-alpine
+```
+
+### Backend
+
+```bash
+cd backend
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+
+cp .env.example .env
+# Edit .env — set DATABASE_URL to point to your local postgres
+
+uvicorn app.main:app --reload
+# API running at http://localhost:8000
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+# App running at http://localhost:5173
+```
+
+The Vite dev server proxies `/api/*` → `http://localhost:8000` automatically.
+
+---
+
+## Environment variables
+
+| Variable | Description | Default |
+|---|---|---|
+| `DATABASE_URL` | asyncpg PostgreSQL URL | `postgresql+asyncpg://postgres:postgres@postgres:5432/jobsearch` |
+| `SECRET_KEY` | JWT signing secret — **change in production** | — |
+| `ALGORITHM` | JWT algorithm | `HS256` |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Token lifetime | `10080` (7 days) |
+
+---
 
 ## AI setup
 
 ### Option A — Anthropic API (Claude, paid)
 
 1. Get a key at [console.anthropic.com](https://console.anthropic.com)
-2. Open the app → Settings → paste your `sk-ant-api...` key → Save
+2. Register/log in → **Settings** → paste your `sk-ant-api...` key → Save
+3. The key is stored in the database per user (not in the browser)
 
 Enables: live web job search, cover letters, outreach, suggestions.
 
 ### Option B — Ollama (free, local)
 
-1. Install [Ollama](https://ollama.com) and pull a model:
-   ```bash
-   ollama pull llama3
-   ```
-2. Start Ollama with CORS open (required for `file://` access):
-   ```bash
-   OLLAMA_ORIGINS=* ollama serve
-   ```
-3. Open the app → Settings → switch provider to **Ollama** → enter model name → Save
+```bash
+ollama pull llama3
+OLLAMA_ORIGINS=* ollama serve
+```
 
-Enables: cover letters, outreach, suggestions, search strategy. Live web search requires Anthropic.
+Then in the app → **Settings** → switch to Ollama → enter model name → Save.
+
+Enables: cover letters, outreach, suggestions, search strategy.  
+Live web search (Find Jobs scan) requires Anthropic.
+
+---
 
 ## Project structure
 
 ```
-job-search/
-├── index.html          # HTML shell — no inline JS or CSS
-├── css/
-│   └── styles.css      # All styles
-└── js/
-    ├── state.js         # App state, localStorage, constants
-    ├── api.js           # Claude + Ollama API calls, provider switching, profile summary
-    ├── ui.js            # Navigation, toast, status bar, shared utils
-    ├── dashboard.js     # Dashboard render
-    ├── tracker.js       # Application CRUD
-    ├── profile.js       # Profile form load/save, skills grid
-    ├── goals.js         # Weekly goals
-    ├── finder.js        # Job scan, smart search links
-    ├── letters.js       # Cover letter generation
-    ├── outreach.js      # Recruiter outreach + agency cards
-    ├── suggestions.js   # Profile analysis, section card render
-    ├── settings.js      # Export / import / clear data
-    └── main.js          # Init
+Job-Search-Platform/
+├── backend/
+│   ├── app/
+│   │   ├── main.py          — FastAPI app, CORS, lifespan
+│   │   ├── config.py        — pydantic-settings
+│   │   ├── database.py      — async SQLAlchemy engine + session
+│   │   ├── models.py        — User, Profile, Application, Goal
+│   │   ├── schemas.py       — Pydantic request/response models
+│   │   ├── auth.py          — bcrypt + JWT
+│   │   ├── deps.py          — get_current_user dependency
+│   │   └── routers/
+│   │       ├── auth.py      — POST /auth/register, /login  GET /auth/me
+│   │       ├── profile.py   — GET/PATCH /profile
+│   │       ├── applications.py — CRUD /applications
+│   │       ├── goals.py     — CRUD /goals + POST /goals/reset-week
+│   │       └── ai.py        — POST /ai/scan, /cover-letter, /outreach, /suggestions
+│   ├── requirements.txt
+│   ├── Dockerfile
+│   └── .env.example
+├── frontend/
+│   ├── src/
+│   │   ├── api/             — typed fetch wrappers (client, auth, applications, goals, profile, ai)
+│   │   ├── context/         — AuthContext (JWT), ToastContext
+│   │   ├── hooks/           — useProfile (shared profile state)
+│   │   ├── components/      — Layout, Sidebar, ProtectedRoute, Spinner
+│   │   └── pages/           — Login, Register, Dashboard, Tracker, Finder, Letters, Outreach, Suggestions, Goals, Profile, Settings
+│   ├── index.html
+│   ├── vite.config.js       — dev proxy /api → :8000
+│   ├── nginx.conf           — prod: proxy /api → backend service
+│   ├── package.json
+│   └── Dockerfile
+├── docker-compose.yml
+└── README.md
 ```
 
-JS files are loaded via `<script>` tags in dependency order — `state.js` first, `main.js` last — so all functions share the global scope and the app works on `file://` without a server.
+---
 
-## Data & privacy
+## API reference
 
-All data lives in your browser's `localStorage` under the key `sjsh_state`. Your API key is stored separately under `sjsh_api`. Nothing is sent anywhere except directly to Anthropic or your local Ollama instance.
+| Method | Path | Description |
+|---|---|---|
+| POST | `/auth/register` | Create account, returns JWT |
+| POST | `/auth/login` | Login, returns JWT |
+| GET | `/auth/me` | Current user info |
+| GET/PATCH | `/profile` | Get or update profile + AI settings |
+| GET/POST | `/applications` | List or create applications |
+| PATCH/DELETE | `/applications/{id}` | Update or delete |
+| GET/POST | `/goals` | List or create goals |
+| PATCH/DELETE | `/goals/{id}` | Update or delete |
+| POST | `/goals/reset-week` | Uncheck all goals |
+| POST | `/ai/scan` | Job scan (web search or strategy) |
+| POST | `/ai/cover-letter` | Generate cover letter |
+| POST | `/ai/outreach` | Generate outreach message |
+| POST | `/ai/suggestions` | Analyse profile + tracker |
 
-Export your data any time from Settings → Export all data (.json). Import it back on any machine.
-
-## Swiss job boards covered
-
-| Board | Type |
-|---|---|
-| [Jobs.ch](https://www.jobs.ch) | General Swiss board |
-| [SwissDevJobs](https://swissdevjobs.ch) | Tech-focused |
-| [DataCareer.ch](https://datacareer.ch) | AI / Data |
-| [LinkedIn Jobs](https://www.linkedin.com/jobs) | Network + jobs |
-| [Indeed CH](https://ch.indeed.com) | Aggregator |
-| [Glassdoor](https://www.glassdoor.com) | Reviews + jobs |
-| [English Forum Switzerland](https://www.englishforum.ch/jobs) | Expat-friendly |
-| [Swisslinks](https://www.swisslinks.com) | Swiss networking |
-
-## Recruiting agencies
-
-Hays Switzerland · Michael Page CH · Robert Walters CH · Swisslinx · Darwin Recruitment
+Full interactive docs: `http://localhost:8000/docs`
