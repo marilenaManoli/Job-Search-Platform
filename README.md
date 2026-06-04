@@ -6,6 +6,16 @@ A fullstack job search tracker and AI assistant for the Swiss tech market.
 
 ---
 
+## A note on authorship
+
+This project was designed, directed, and built by **Marilena Manoli**. The sole listed contributor in the git history is [Claude Sonnet](https://anthropic.com/claude) (Anthropic's AI assistant), because the code was written interactively through Claude Code — Anthropic's AI-powered CLI — which authored the commits directly as part of the workflow.
+
+Claude was used as a development assistance tool throughout: writing boilerplate, debugging errors (like the `bcrypt`/`passlib` incompatibility), generating the modular file structure, and implementing features based on direction given at each step. All product decisions — the feature set, the Swiss job market focus, the tech stack choices, the AI integrations — were made by the human developer.
+
+This is an honest reflection of how modern AI-assisted development works: the human drives, the AI writes. The project is the result of that collaboration.
+
+---
+
 ## Quick start (Docker)
 
 ```bash
